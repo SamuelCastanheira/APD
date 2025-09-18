@@ -23,7 +23,7 @@ function auto_email() {
       {
         if (message.isUnread)
         {
-          const regex = /@graduacao.uerj.br/;
+          const regex = /@setorA.empresa.br/;
           if (regex.test(message.getFrom()))
           {
             if (thread.getLabels().includes(label) == false)
