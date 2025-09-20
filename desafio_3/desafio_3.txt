@@ -1,0 +1,121 @@
+var matriculas = [
+  2020001,
+  2021002,
+  2020003,
+  2019004,
+  2021005,
+  2022006,
+  2020007,
+  2021008,
+  2020009,
+  2019010,
+  2022011,
+  2021012,
+  2020013,
+  2019014,
+  2021015,
+  2020016,
+  2020017,
+  2022018,
+  2021019,
+  2019020,
+  2020021,
+  2020022,
+  2021023,
+  2022024,
+  2019025
+  ];
+
+  var id = "17YUsDfkfJyqTzfT419U_92e2g_HFEDuFyzfBvNUSIjU";
+  var ss = SpreadsheetApp.openById(id);
+  var aba_academicos = ss.getSheetByName("Discentes - Dados Acadêmicos");
+  var aba_pessoais = ss.getSheetByName("Discentes - Dados Pessoais");
+
+  var criterio = "";
+
+function main (){
+  criterio = "CR"
+  ordenarMatriculas(matriculas,criterio);
+
+  criterio = "IDADE";
+  ordenarMatriculas(matriculas,criterio);
+
+  criterio = "PERIODO";
+  ordenarMatriculas(matriculas,criterio);
+
+}
+
+ function ordenarMatriculas(matriculasParaOrdenar, criterio) {
+   matriculasParaOrdenar.sort((alunoA, alunoB) => {
+     switch (criterio.toUpperCase()) {
+       case "IDADE":
+         const nascimentoA = calcularIdade(alunoA);
+         const nascimentoB = calcularIdade(alunoB);
+         //Do mais velho pro mais novo
+         return nascimentoB - nascimentoA;
+
+       case "CR":
+         //O maior CR primeiro
+         const CR_A = calcularCR(alunoA);
+         const CR_B = calcularCR(alunoB);
+         return CR_B - CR_A;
+
+       case "PERIODO":
+        //O período de ingresso mais recente primeiro
+         const periodo_A = calcularPeriodo(alunoA);
+         const periodo_B = calcularPeriodo(alunoB);
+         return periodo_B - periodo_A;
+        
+       default:
+         throw new Error("Critério inválido! Use: IDADE, CR ou PERIODO");
+     }
+
+   });
+   
+   return matriculasParaOrdenar;
+ }
+
+function calcularCR(matricula)
+{
+  var buscador = aba_academicos.createTextFinder(matricula.toString());
+  var index = buscador.findNext();
+  if (index === null)
+  {
+    throw new Error("Matricula "+matricula+ " nao existe no sistema!");
+  }
+  index = index.getRow();
+  var linha = aba_academicos.getRange(index,1,1,aba_academicos.getLastColumn()).getValues()[0];
+  var cr = linha[4];
+  return cr; 
+}
+
+function calcularIdade(matricula)
+{
+  var buscador = aba_pessoais.createTextFinder(matricula.toString());
+  var index = buscador.findNext();
+  if (index === null)
+  {
+    throw new Error("Matricula "+matricula+ " nao existe no sistema!");
+  }
+  index = index.getRow();
+  var linha = aba_pessoais.getRange(index,1,1,aba_pessoais.getLastColumn()).getValues()[0];
+  var ano_nascimento = linha[2];
+  var idade = new Date().getFullYear() - ano_nascimento;
+  return idade; 
+}
+
+function calcularPeriodo(matricula)
+{
+  var buscador = aba_academicos.createTextFinder(matricula.toString());
+  var index = buscador.findNext();
+  if (index === null)
+  {
+    throw new Error("Matricula "+matricula+ " nao existe no sistema!");
+  }
+  index = index.getRow();
+  var linha = aba_academicos.getRange(index,1,1,aba_pessoais.getLastColumn()).getValues()[0];
+  var periodo = linha[2];
+  return periodo; 
+}
+
+main();
